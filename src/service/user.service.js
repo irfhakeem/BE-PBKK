@@ -28,6 +28,7 @@ export const RegisterUser = async (data) => {
         username: data.username,
         email: data.email,
         password: hashedPwd,
+        avatar: data.avatar,
       },
     });
 
@@ -221,5 +222,33 @@ export const DeleteUser = async (id) => {
     return { data: "User deleted successfully" };
   } catch (error) {
     return { error: messages.ErrDeleteUser };
+  }
+};
+
+export const GetUserByUsername = async (username) => {
+  try {
+    const user = await prisma.users.findUnique({
+      where: {
+        username: username,
+      },
+    });
+
+    if (!user) {
+      return { error: messages.ErrUserNotFound };
+    }
+
+    return {
+      data: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        username: user.username,
+        avatar: user.avatar,
+        bio: user.bio,
+        banner: user.banner,
+      },
+    };
+  } catch (error) {
+    return { error: error.message };
   }
 };
