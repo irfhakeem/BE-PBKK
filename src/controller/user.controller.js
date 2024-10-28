@@ -5,6 +5,7 @@ import {
   Me,
   UpdateUser,
   DeleteUser,
+  GetUserByUsername,
 } from "../service/user.service.js";
 
 const _RegisterUser = async (req, res) => {
@@ -96,10 +97,28 @@ const _DeleteUser = async (req, res) => {
   }
 };
 
+const _GetUserByUsername = async (req, res) => {
+  try {
+    const user = await GetUserByUsername(req.params.username);
+    if (user.error) {
+      return res.status(404).json({ message: user.error });
+    }
+
+    res.status(200).json({
+      status: "success",
+      message: messages.SuccessGetUser,
+      data: user.data,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error retrieving user", error });
+  }
+};
+
 export default {
   _LoginUser,
   _RegisterUser,
   _Me,
   _UpdateUser,
   _DeleteUser,
+  _GetUserByUsername,
 };
