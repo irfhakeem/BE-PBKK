@@ -128,6 +128,10 @@ export const Me = async (id) => {
         id: user.id,
         name: user.name,
         email: user.email,
+        username: user.username,
+        avatar: user.avatar,
+        bio: user.bio,
+        banner: user.banner,
       },
     };
   } catch (error) {
