@@ -8,6 +8,7 @@ var messages = {
   ErrInputValidation: "invalid input",
   ErrAccountSuspension: "account suspended",
   ErrDeleteUser: "error while deleting user",
+  ErrDeactivateUser: "error while deactivating user",
 
   //   Success
   SuccessGetUser: "user retrieved successfully",
@@ -15,6 +16,7 @@ var messages = {
   SuccessLoginUser: "user logged in successfully",
   SuccessUpdateUser: "user updated successfully",
   SuccessDeleteUser: "user deleted successfully",
+  SuccessDeactivateUser: "user deactivated successfully",
 };
 
 export default messages;
