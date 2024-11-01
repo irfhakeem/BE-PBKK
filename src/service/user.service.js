@@ -65,7 +65,7 @@ export const LoginUser = async (data) => {
     });
 
     if (!user) {
-      return { error: "User not found" };
+      return { error: "Email not exist" };
     }
 
     if (user.loginSuspended && user.loginSuspended > new Date()) {
@@ -98,7 +98,7 @@ export const LoginUser = async (data) => {
 
     await prisma.users.update({
       where: { id: user.id },
-      data: { loginAttempts: 0, loginSuspended: null },
+      data: { loginAttempts: 0, loginSuspended: null, isDeactivated: false },
     });
 
     return {
@@ -231,6 +231,7 @@ export const GetUserByUsername = async (username) => {
     const user = await prisma.users.findUnique({
       where: {
         username: username,
+        isDeactivated: false,
       },
     });
 
@@ -251,5 +252,22 @@ export const GetUserByUsername = async (username) => {
     };
   } catch (error) {
     return { error: error.message };
+  }
+};
+
+export const DeactivateUser = async (id) => {
+  try {
+    await prisma.users.update({
+      data: {
+        isDeactivated: true,
+      },
+      where: {
+        id: id,
+      },
+    });
+
+    return { message: messages.SuccessDeactivateUser };
+  } catch (error) {
+    return { error: messages.ErrDeactivateUser };
   }
 };
