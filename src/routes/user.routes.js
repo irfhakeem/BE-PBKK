@@ -8,5 +8,6 @@ router.get("/user/me", authenticate, userController._Me);
 router.patch("/user/update-profile", authenticate, userController._UpdateUser);
 router.delete("/user/delete-profile", authenticate, userController._DeleteUser);
 router.get("/user/:username", authenticate, userController._GetUserByUsername);
+router.patch("/user/deactivate", authenticate, userController._DeactivateUser);
 
 export default router;
