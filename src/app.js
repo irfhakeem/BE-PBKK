@@ -18,6 +18,11 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use("/api/v1", routes);
 
+// Serve static files
+app.use("/avatar", express.static("upload/avatar"));
+app.use("/banner", express.static("upload/banner"));
+app.use("/thumbnail", express.static("upload/thumbnail"));
+
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
