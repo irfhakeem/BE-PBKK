@@ -6,6 +6,7 @@ import {
   UpdateUser,
   DeleteUser,
   GetUserByUsername,
+  DeactivateUser,
 } from "../service/user.service.js";
 
 const _RegisterUser = async (req, res) => {
@@ -114,6 +115,24 @@ const _GetUserByUsername = async (req, res) => {
   }
 };
 
+const _DeactivateUser = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const user = await DeactivateUser(userId);
+
+    if (user.error) {
+      return res.status(400).json({ message: user.error });
+    }
+
+    return res.status(200).json({
+      status: "success",
+      message: user.message,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error deactivating user", error });
+  }
+};
+
 export default {
   _LoginUser,
   _RegisterUser,
@@ -121,4 +140,5 @@ export default {
   _UpdateUser,
   _DeleteUser,
   _GetUserByUsername,
+  _DeactivateUser,
 };
