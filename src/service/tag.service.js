@@ -37,14 +37,45 @@ export const CreateTag = async (data) => {
   }
 };
 
-export const GetTags = async () => {
+export const GetRecommendedTags = async () => {
   try {
+    const tagsCount = await prisma.tags.count();
+    if (tagsCount === 0) {
+      return { data: [] };
+    }
+
+    const randomSkip =
+      tagsCount > 7 ? Math.floor(Math.random() * (tagsCount - 7)) : 0;
+
+    console.log(randomSkip);
+
     const tags = await prisma.tags.findMany({
-      take: 8,
+      skip: randomSkip,
+      take: 7,
     });
 
     return {
       data: tags,
+    };
+  } catch (error) {
+    return { error: error.message };
+  }
+};
+
+export const GetTagById = async (data) => {
+  try {
+    const tag = await prisma.tags.findUnique({
+      where: {
+        id: data.id,
+      },
+    });
+
+    if (!tag) {
+      return { error: "Tag not found" };
+    }
+
+    return {
+      data: tag,
     };
   } catch (error) {
     return { error: error.message };
