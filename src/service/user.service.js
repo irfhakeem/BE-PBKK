@@ -255,6 +255,30 @@ export const GetUserByUsername = async (username) => {
   }
 };
 
+export const GetRandomUsers = async (userId) => {
+  try {
+    const users = await prisma.users.findMany({
+      where: {
+        id: {
+          not: userId,
+        },
+      },
+      take: 4,
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    if (!users) {
+      return { error: messages.ErrGetUser };
+    }
+
+    return { data: users };
+  } catch (error) {
+    return { error: error.message };
+  }
+};
+
 export const DeactivateUser = async (id) => {
   try {
     await prisma.users.update({
@@ -269,5 +293,63 @@ export const DeactivateUser = async (id) => {
     return { message: messages.SuccessDeactivateUser };
   } catch (error) {
     return { error: messages.ErrDeactivateUser };
+  }
+};
+
+export const FollowUser = async (userId, data) => {
+  try {
+    const follow = await prisma.userFollowers.create({
+      data: {
+        followerId: userId,
+        followingId: data.followingId,
+      },
+    });
+
+    return {
+      data: {
+        followerId: follow.followerId,
+        followingId: follow.followingId,
+      },
+    };
+  } catch (error) {
+    return { error: error.message };
+  }
+};
+
+export const UnfollowUser = async (userId, data) => {
+  try {
+    await prisma.userFollowers.delete({
+      where: {
+        followerId_followingId: {
+          followerId: userId,
+          followingId: data.followingId,
+        },
+      },
+    });
+
+    return { message: "Success unfollow user" };
+  } catch (error) {
+    return { error: error.message };
+  }
+};
+
+export const IsFollowing = async (userId, data) => {
+  try {
+    const follow = await prisma.userFollowers.findUnique({
+      where: {
+        followerId_followingId: {
+          followerId: userId,
+          followingId: data.followingId,
+        },
+      },
+    });
+
+    return {
+      data: {
+        isFollowing: follow ? true : false,
+      },
+    };
+  } catch (error) {
+    return { error: error.message };
   }
 };
