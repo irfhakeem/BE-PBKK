@@ -1,4 +1,8 @@
-import { CreateTag, GetTags } from "../service/tag.service";
+import {
+  CreateTag,
+  GetRecommendedTags,
+  GetTagById,
+} from "../service/tag.service.js";
 
 const _CreateTag = async (req, res) => {
   try {
@@ -13,9 +17,22 @@ const _CreateTag = async (req, res) => {
   }
 };
 
-const _GetTags = async (req, res) => {
+const _GetRecommendedTags = async (req, res) => {
   try {
-    const response = await GetTags();
+    const response = await GetRecommendedTags();
+    if (response.error) {
+      return res.status(400).json({ message: response.error });
+    }
+
+    return res.status(200).json({ data: response.data });
+  } catch (error) {
+    return res.status(500).json({ message: response.error });
+  }
+};
+
+const _GetTagById = async (req, res) => {
+  try {
+    const response = await GetTagById(req.params.id);
     if (response.error) {
       return res.status(400).json({ message: response.error });
     }
@@ -28,5 +45,6 @@ const _GetTags = async (req, res) => {
 
 export default {
   _CreateTag,
-  _GetTags,
+  _GetRecommendedTags,
+  _GetTagById,
 };
