@@ -7,6 +7,10 @@ import {
   DeleteUser,
   GetUserByUsername,
   DeactivateUser,
+  FollowUser,
+  UnfollowUser,
+  IsFollowing,
+  GetRandomUsers,
 } from "../service/user.service.js";
 
 const _RegisterUser = async (req, res) => {
@@ -115,6 +119,24 @@ const _GetUserByUsername = async (req, res) => {
   }
 };
 
+const _GetRandomUsers = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const users = await GetRandomUsers(userId);
+    if (users.error) {
+      return res.status(400).json({ message: users.error });
+    }
+
+    res.status(200).json({
+      status: "success",
+      message: "Users retrieved successfully.",
+      data: users.data,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching users", error });
+  }
+};
+
 const _DeactivateUser = async (req, res) => {
   try {
     const userId = req.userId;
@@ -133,6 +155,59 @@ const _DeactivateUser = async (req, res) => {
   }
 };
 
+const _FollowUser = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const follow = await FollowUser(userId, req.body);
+
+    if (follow.error) {
+      return res.status(400).json({ message: follow.error });
+    }
+
+    res.status(200).json({
+      status: "success",
+      message: "Success Follow user",
+      data: follow.data,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error following user", error });
+  }
+};
+
+const _UnfollowUser = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const follow = await UnfollowUser(userId, req.body);
+
+    if (follow.error) {
+      return res.status(400).json({ message: follow.error });
+    }
+
+    res.status(204).end();
+  } catch (error) {
+    res.status(500).json({ message: "Error unfollow user ", error });
+  }
+};
+
+const _IsFollowing = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const follow = await IsFollowing(userId, req.body);
+
+    if (follow.error) {
+      return res.status(400).json({ message: follow.error });
+    }
+
+    res.status(200).json({
+      status: "success",
+      message: "User is following",
+      data: follow.data,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error following user", error });
+  }
+};
+
 export default {
   _LoginUser,
   _RegisterUser,
@@ -140,5 +215,9 @@ export default {
   _UpdateUser,
   _DeleteUser,
   _GetUserByUsername,
+  _GetRandomUsers,
   _DeactivateUser,
+  _FollowUser,
+  _UnfollowUser,
+  _IsFollowing,
 };
