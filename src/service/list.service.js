@@ -1,9 +1,9 @@
 import { PrismaClient } from "@prisma/client";
-import messages from "../helpers/messages/list.message";
+import messages from "../helpers/messages/list.message.js";
 
 const prisma = new PrismaClient();
 
-export const getUserLists = async (userId) => {
+export const getMyLists = async (userId) => {
   try {
     const lists = await prisma.lists.findMany({
       where: {
@@ -45,7 +45,6 @@ export const createList = async (userId, data) => {
       data: {
         userId: userId,
         title: data.title,
-        description: data.description,
       },
     });
 
@@ -68,6 +67,22 @@ export const deleteList = async (listId) => {
     });
 
     return { message: messages.SuccessDeleteList };
+  } catch (error) {
+    return { error: error.message };
+  }
+};
+
+export const getUserLists = async (data) => {
+  try {
+    const lists = await prisma.lists.findMany({
+      where: {
+        userId: data.userId,
+      },
+    });
+
+    return {
+      data: lists,
+    };
   } catch (error) {
     return { error: error.message };
   }
