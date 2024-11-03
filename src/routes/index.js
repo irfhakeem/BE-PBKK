@@ -4,6 +4,7 @@ import authRoutes from "./auth.routes.js";
 import postRoutes from "./post.routes.js";
 import storageRoutes from "./storage.routes.js";
 import bookmarkRoutes from "./bookmark.routes.js";
+import listRoutes from "./list.routes.js";
 
 const router = express.Router();
 
@@ -12,5 +13,6 @@ router.use(authRoutes);
 router.use(postRoutes);
 router.use(storageRoutes);
 router.use(bookmarkRoutes);
+router.use(listRoutes);
 
 export default router;
