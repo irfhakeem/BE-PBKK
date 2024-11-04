@@ -4,6 +4,9 @@ import {
   getSpecificList,
   getUserLists,
   getMyLists,
+  addPostToList,
+  removePostFromList,
+  isPostListed,
 } from "../service/list.service.js";
 
 const _createList = async (req, res) => {
@@ -72,10 +75,59 @@ const _getUserLists = async (req, res) => {
   }
 };
 
+const _addPostToList = async (req, res) => {
+  try {
+    const response = await addPostToList(req.body);
+    if (response.error) {
+      return res.status(400).json({ message: response.error });
+    }
+
+    return res.status(200).json({ data: response.data });
+  } catch (error) {
+    return res.status(500).json({ message: response.error });
+  }
+};
+
+const _removePostFromList = async (req, res) => {
+  try {
+    const response = await removePostFromList(req.body);
+    if (response.error) {
+      return res.status(400).json({ message: response.error });
+    }
+
+    return res.status(200).json({ data: response.data });
+  } catch (error) {
+    return res.status(500).json({ message: response.error });
+  }
+};
+
+const _isPostListed = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const response = await isPostListed(userId, req.body);
+    if (response.error) {
+      return res.status(400).json({ message: response.error });
+    }
+
+    return res.status(200).json({
+      message: response.message,
+      data: {
+        isListed: response.data,
+        listId: response.listId,
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({ message: response.error });
+  }
+};
+
 export default {
   _createList,
   _getMyLists,
   _getSpecificList,
   _deleteList,
   _getUserLists,
+  _addPostToList,
+  _removePostFromList,
+  _isPostListed,
 };
