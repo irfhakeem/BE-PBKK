@@ -11,6 +11,7 @@ import {
   UnfollowUser,
   IsFollowing,
   GetRandomUsers,
+  GetFollowing,
 } from "../service/user.service.js";
 
 const _RegisterUser = async (req, res) => {
@@ -208,6 +209,20 @@ const _IsFollowing = async (req, res) => {
   }
 };
 
+const _GetFollowing = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const response = await GetFollowing(userId);
+    if (response.error) {
+      return res.status(400).json({ message: response.error });
+    }
+
+    return res.status(201).json({ data: response.data });
+  } catch (error) {
+    return res.status(500).json({ message: response.error });
+  }
+};
+
 export default {
   _LoginUser,
   _RegisterUser,
@@ -220,4 +235,5 @@ export default {
   _FollowUser,
   _UnfollowUser,
   _IsFollowing,
+  _GetFollowing,
 };
