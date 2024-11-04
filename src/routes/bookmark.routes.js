@@ -11,5 +11,10 @@ router.delete(
   authenticate,
   bookmarkController._deleteBookmark
 );
+router.post(
+  "/bookmark/is-bookmarked",
+  authenticate,
+  bookmarkController._isBookmarked
+);
 
 export default router;
