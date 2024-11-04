@@ -37,6 +37,21 @@ export const RegisterUser = async (data) => {
       return { error: messages.ErrCreateUser };
     }
 
+    const list = await prisma.lists.create({
+      data: {
+        user: {
+          connect: {
+            id: user.id,
+          },
+        },
+        title: "Reading List",
+      },
+    });
+
+    if (!list) {
+      return { error: "Error creating reading list" };
+    }
+
     return {
       data: {
         id: user.id,
@@ -105,7 +120,7 @@ export const LoginUser = async (data) => {
       data: {
         id: user.id,
         username: user.username,
-        token: generateToken({ id: user.id }, "2h"),
+        token: generateToken({ id: user.id, username: user.username }, "2h"),
       },
     };
   } catch (error) {
@@ -347,6 +362,24 @@ export const IsFollowing = async (userId, data) => {
     return {
       data: {
         isFollowing: follow ? true : false,
+      },
+    };
+  } catch (error) {
+    return { error: error.message };
+  }
+};
+
+export const GetFollowing = async (userId) => {
+  try {
+    const following = await prisma.userFollowers.findMany({
+      where: {
+        followerId: userId,
+      },
+    });
+
+    return {
+      data: {
+        followingId: following.map((f) => f.followingId),
       },
     };
   } catch (error) {
