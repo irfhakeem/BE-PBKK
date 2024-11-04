@@ -2,7 +2,7 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export const CreatePost = async (data, userId) => {
+export const CreatePost = async (data, userId, username) => {
   try {
     if (
       data.title === "" ||
@@ -24,9 +24,11 @@ export const CreatePost = async (data, userId) => {
             id: userId,
           },
         },
+        authorUsername: username,
       },
     });
 
+    console.log(data, userId, username);
     return {
       data: {
         id: post.id,
@@ -34,7 +36,8 @@ export const CreatePost = async (data, userId) => {
         content: post.content,
         caption: post.caption,
         image: post.image,
-        author: post.userId,
+        author: post.authorId,
+        authorUsername: post.authorUsername,
       },
     };
   } catch (error) {
