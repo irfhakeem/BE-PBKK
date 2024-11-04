@@ -11,8 +11,8 @@ export const getMyLists = async (userId) => {
       },
     });
 
-    if (!lists) {
-      return { error: messages.ErrListNotFound };
+    if (!lists || lists.length === 0) {
+      return { error: "No lists found for this user." };
     }
 
     return { data: lists };
@@ -33,7 +33,17 @@ export const getSpecificList = async (listId) => {
       return { error: messages.ErrListNotFound };
     }
 
-    return { data: list };
+    const posts = await prisma.posts.findMany({
+      where: {
+        lists: {
+          some: {
+            id: listId,
+          },
+        },
+      },
+    });
+
+    return { data: { ...list, posts } };
   } catch (error) {
     return { error: error.message };
   }
@@ -78,10 +88,93 @@ export const getUserLists = async (data) => {
       where: {
         userId: data.userId,
       },
+      include: {
+        posts: {
+          take: 3,
+        },
+      },
     });
 
+    if (!lists || lists.length === 0) {
+      return { error: "No lists found for this user." };
+    }
+
+    return { data: lists };
+  } catch (error) {
+    return { error: error.message };
+  }
+};
+
+export const addPostToList = async (data) => {
+  try {
+    const list = await prisma.lists.update({
+      where: {
+        id: data.listId,
+      },
+      data: {
+        posts: {
+          connect: { id: data.postId },
+        },
+      },
+    });
+
+    if (!list) {
+      return { error: "List not found" };
+    }
+
+    return { data: list };
+  } catch (error) {
+    return { error: error.message };
+  }
+};
+
+export const removePostFromList = async (data) => {
+  try {
+    const list = await prisma.lists.update({
+      where: {
+        id: data.listId,
+      },
+      data: {
+        posts: {
+          disconnect: { id: data.postId },
+        },
+      },
+    });
+
+    if (!list) {
+      return { error: "List not found" };
+    }
+
+    return { data: list };
+  } catch (error) {
+    return { error: error.message };
+  }
+};
+
+export const isPostListed = async (userId, data) => {
+  try {
+    const listWithPost = await prisma.lists.findFirst({
+      where: {
+        userId: userId,
+        posts: {
+          some: {
+            id: data.postId,
+          },
+        },
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (!listWithPost) {
+      return { data: false, message: "Post is not in any of the user's lists" };
+    }
+
     return {
-      data: lists,
+      data: true,
+      listId: listWithPost.id,
+      message: "Post found in user's list",
     };
   } catch (error) {
     return { error: error.message };
