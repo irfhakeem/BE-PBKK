@@ -2,6 +2,7 @@ import {
   addBookmark,
   deleteBookmark,
   getUserBookmarks,
+  isBookmarked,
 } from "../service/bookmark.service.js";
 import messages from "../helpers/messages/bookmark.message.js";
 
@@ -59,4 +60,28 @@ const _getUserBookmarks = async (req, res) => {
   }
 };
 
-export default { _addBookmark, _deleteBookmark, _getUserBookmarks };
+const _isBookmarked = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const bookmark = await isBookmarked(userId, req.body);
+
+    if (bookmark.error) {
+      return res.status(400).json({ error: bookmark.error });
+    }
+
+    return res.status(200).json({
+      status: "success",
+      message: "User bookmarked this post",
+      data: bookmark.data,
+    });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+export default {
+  _addBookmark,
+  _deleteBookmark,
+  _getUserBookmarks,
+  _isBookmarked,
+};
