@@ -8,7 +8,8 @@ import {
 const _CreatePost = async (req, res) => {
   try {
     const userId = req.userId;
-    const post = await CreatePost(req.body, userId);
+    const userUsername = req.userUsername;
+    const post = await CreatePost(req.body, userId, userUsername);
     if (post.error) {
       return res.status(400).json({ message: post.error });
     }
