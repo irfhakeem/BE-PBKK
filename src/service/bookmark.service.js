@@ -4,7 +4,6 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-// NEED FIX
 export const getUserBookmarks = async (userId) => {
   try {
     const user = await prisma.users.findUnique({
@@ -65,6 +64,27 @@ export const addBookmark = async (userId, data) => {
     return {
       data: {
         id: bookmark.id,
+      },
+    };
+  } catch (error) {
+    return { error: error.message };
+  }
+};
+
+export const isBookmarked = async (userId, data) => {
+  try {
+    const bookmark = await prisma.bookmarks.findUnique({
+      where: {
+        userId_postId: {
+          userId: userId,
+          postId: data.postId,
+        },
+      },
+    });
+
+    return {
+      data: {
+        isBookmarked: bookmark ? true : false,
       },
     };
   } catch (error) {
