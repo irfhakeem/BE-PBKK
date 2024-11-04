@@ -5,9 +5,16 @@ import listController from "../controller/list.controller.js";
 const router = express.Router();
 
 router.get("/list", authenticate, listController._getMyLists);
-router.get("/user-list", authenticate, listController._getUserLists);
-router.get("/list/:id", authenticate, listController._getSpecificList);
+router.post("/list/user-lists", authenticate, listController._getUserLists);
 router.post("/list/create", authenticate, listController._createList);
 router.delete("/list/delete", authenticate, listController._deleteList);
+router.post("/list/add-post", authenticate, listController._addPostToList);
+router.patch(
+  "/list/remove-post",
+  authenticate,
+  listController._removePostFromList
+);
+router.post("/list/is-post-listed", authenticate, listController._isPostListed);
+router.get("/list/:id", authenticate, listController._getSpecificList);
 
 export default router;
