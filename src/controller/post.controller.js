@@ -6,6 +6,9 @@ import {
   LikePost,
   UnlikePost,
   IsPostLiked,
+  CommentPost,
+  DeleteComment,
+  GetComments,
 } from "../service/post.service.js";
 
 const _CreatePost = async (req, res) => {
@@ -135,6 +138,56 @@ const _IsPostLiked = async (req, res) => {
   }
 };
 
+const _CommentPost = async (req, res) => {
+  try {
+    const post = await CommentPost(req.body, req.userId);
+    if (post.error) {
+      return res.status(400).json({ message: post.error });
+    }
+
+    res.status(200).json({
+      status: "success",
+      message: "Post commented successfully.",
+      data: post.data,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error commenting on post", error });
+  }
+};
+
+const _DeleteComment = async (req, res) => {
+  try {
+    const post = await DeleteComment(req.params.id);
+    if (post.error) {
+      return res.status(400).json({ message: post.error });
+    }
+
+    res.status(204).json({
+      status: "success",
+      message: "Comment deleted successfully.",
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error deleting comment", error });
+  }
+};
+
+const _GetComments = async (req, res) => {
+  try {
+    const post = await GetComments(req.params.id);
+    if (post.error) {
+      return res.status(400).json({ message: post.error });
+    }
+
+    res.status(200).json({
+      status: "success",
+      message: "Comments retrieved successfully.",
+      data: post.data,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching comments", error });
+  }
+};
+
 export default {
   _CreatePost,
   _GetPosts,
@@ -143,4 +196,7 @@ export default {
   _LikePost,
   _UnlikePost,
   _IsPostLiked,
+  _CommentPost,
+  _DeleteComment,
+  _GetComments,
 };
