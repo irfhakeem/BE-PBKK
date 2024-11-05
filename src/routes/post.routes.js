@@ -11,5 +11,8 @@ router.delete("/post/delete/:id", authenticate, postController._DeletePost);
 router.post("/post/like", authenticate, postController._LikePost);
 router.delete("/post/unlike", authenticate, postController._UnlikePost);
 router.post("/post/is-liked", authenticate, postController._IsPostLiked);
+router.post("/post/comment", authenticate, postController._CommentPost);
+router.delete("/post/uncomment", authenticate, postController._DeleteComment);
+router.post("/post/comments", authenticate, postController._GetComments);
 
 export default router;
