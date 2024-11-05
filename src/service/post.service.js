@@ -68,6 +68,7 @@ export const GetPosts = async (data) => {
       };
     }
 
+    // Fetch posts with like counts
     const posts = await prisma.posts.findMany({
       take: limit,
       skip: skip,
@@ -75,10 +76,21 @@ export const GetPosts = async (data) => {
         createdAt: "desc",
       },
       where: data.userId ? { authorId: data.userId } : undefined,
+      include: {
+        _count: {
+          select: { likes: true },
+        },
+      },
     });
 
+    // Map posts to include likeCount property
+    const postsWithLikes = posts.map((post) => ({
+      ...post,
+      likeCount: post._count.likes,
+    }));
+
     return {
-      data: posts,
+      data: postsWithLikes,
       pagination: {
         total: totalPosts,
         round: data.round,
@@ -95,8 +107,11 @@ export const GetPosts = async (data) => {
 export const GetPostById = async (id) => {
   try {
     const post = await prisma.posts.findUnique({
-      where: {
-        id: id,
+      where: { id: id },
+      include: {
+        _count: {
+          select: { likes: true },
+        },
       },
     });
 
@@ -105,10 +120,14 @@ export const GetPostById = async (id) => {
     }
 
     return {
-      data: post,
+      data: {
+        ...post,
+        likeCount: post._count.likes,
+      },
     };
   } catch (error) {
-    return { error: error.message };
+    console.error("Error fetching post by ID:", error);
+    return { error: "An error occurred while fetching the post." };
   }
 };
 
@@ -126,6 +145,65 @@ export const DeletePost = async (id) => {
 
     return {
       data: "Post deleted successfully.",
+    };
+  } catch (error) {
+    return { error: error.message };
+  }
+};
+
+export const LikePost = async (data, userId) => {
+  try {
+    const res = await prisma.likes.create({
+      data: {
+        postId: data.postId,
+        userId: userId,
+      },
+    });
+
+    if (!res) {
+      return { error: "Error liking post." };
+    }
+
+    return {
+      data: {
+        postId: res.postId,
+        userId: res.userId,
+      },
+    };
+  } catch (error) {
+    return { error: error.message };
+  }
+};
+
+export const UnlikePost = async (data, userId) => {
+  try {
+    await prisma.likes.delete({
+      where: {
+        userId_postId: {
+          postId: data.postId,
+          userId: userId,
+        },
+      },
+    });
+    return { message: "Success unliking post." };
+  } catch (error) {
+    console.error("Error in UnlikePost:", error);
+    return { error: "Failed to unlike post." };
+  }
+};
+
+export const IsPostLiked = async (data, userId) => {
+  try {
+    const like = await prisma.likes.findUnique({
+      where: {
+        userId_postId: {
+          postId: data.postId,
+          userId: userId,
+        },
+      },
+    });
+    return {
+      data: like ? true : false,
     };
   } catch (error) {
     return { error: error.message };
