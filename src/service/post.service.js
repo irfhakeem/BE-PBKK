@@ -78,7 +78,7 @@ export const GetPosts = async (data) => {
       where: data.userId ? { authorId: data.userId } : undefined,
       include: {
         _count: {
-          select: { likes: true },
+          select: { likes: true, comments: true },
         },
       },
     });
@@ -87,6 +87,7 @@ export const GetPosts = async (data) => {
     const postsWithLikes = posts.map((post) => ({
       ...post,
       likeCount: post._count.likes,
+      commentCount: post._count.comments,
     }));
 
     return {
@@ -110,7 +111,7 @@ export const GetPostById = async (id) => {
       where: { id: id },
       include: {
         _count: {
-          select: { likes: true },
+          select: { likes: true, comments: true },
         },
       },
     });
@@ -123,6 +124,7 @@ export const GetPostById = async (id) => {
       data: {
         ...post,
         likeCount: post._count.likes,
+        commentCount: post._count.comments,
       },
     };
   } catch (error) {
@@ -204,6 +206,62 @@ export const IsPostLiked = async (data, userId) => {
     });
     return {
       data: like ? true : false,
+    };
+  } catch (error) {
+    return { error: error.message };
+  }
+};
+
+export const CommentPost = async (data, userId) => {
+  try {
+    const comment = await prisma.comments.create({
+      data: {
+        postId: data.postId,
+        userId: userId,
+        content: data.content,
+      },
+    });
+
+    return {
+      data: {
+        id: comment.id,
+        postId: comment.postId,
+        userId: comment.userId,
+        content: comment.content,
+      },
+    };
+  } catch (error) {
+    return { error: error.message };
+  }
+};
+
+export const GetComments = async (postId) => {
+  try {
+    const comments = await prisma.comments.findMany({
+      where: {
+        postId: postId,
+      },
+    });
+
+    return {
+      data: comments,
+    };
+  } catch (error) {
+    return { error: error.message };
+  }
+};
+
+export const DeleteComment = async (data, userId) => {
+  try {
+    await prisma.comments.delete({
+      where: {
+        id: data.commentId,
+        userId: userId,
+      },
+    });
+
+    return {
+      data: "Comment deleted successfully.",
     };
   } catch (error) {
     return { error: error.message };
