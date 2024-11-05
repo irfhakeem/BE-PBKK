@@ -3,6 +3,9 @@ import {
   GetPosts,
   GetPostById,
   DeletePost,
+  LikePost,
+  UnlikePost,
+  IsPostLiked,
 } from "../service/post.service.js";
 
 const _CreatePost = async (req, res) => {
@@ -78,9 +81,66 @@ const _DeletePost = async (req, res) => {
   }
 };
 
+const _LikePost = async (req, res) => {
+  try {
+    const post = await LikePost(req.body, req.userId);
+    if (post.error) {
+      return res.status(400).json({ message: post.error });
+    }
+
+    res.status(200).json({
+      status: "success",
+      message: "Post liked successfully.",
+      data: post.data,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error liking post", error });
+  }
+};
+
+const _UnlikePost = async (req, res) => {
+  try {
+    const result = await UnlikePost(req.body, req.userId);
+    console.log(result);
+    if (result.error) {
+      return res.status(400).json({ message: result.error });
+    }
+
+    res.status(204).json({
+      status: "success",
+      message: result.message,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: "Error unliking post", error });
+  }
+};
+
+const _IsPostLiked = async (req, res) => {
+  try {
+    const post = await IsPostLiked(req.body, req.userId);
+
+    if (post.error) {
+      return res.status(400).json({ message: post.error });
+    }
+
+    res.status(200).json({
+      status: "success",
+      message: "Post like status retrieved successfully.",
+      data: post.data,
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Error retrieving like status", error });
+  }
+};
+
 export default {
   _CreatePost,
   _GetPosts,
   _GetPostById,
   _DeletePost,
+  _LikePost,
+  _UnlikePost,
+  _IsPostLiked,
 };
