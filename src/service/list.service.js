@@ -41,9 +41,22 @@ export const getSpecificList = async (listId) => {
           },
         },
       },
+      include: {
+        _count: {
+          select: { likes: true, comments: true },
+        },
+      },
     });
 
-    return { data: { ...list, posts } };
+    const formattedPosts = posts.map((post) => {
+      return {
+        ...post,
+        likeCount: post._count.likes,
+        commentCount: post._count.comments,
+      };
+    });
+
+    return { data: { ...list, posts: formattedPosts } };
   } catch (error) {
     return { error: error.message };
   }
@@ -68,11 +81,11 @@ export const createList = async (userId, data) => {
   }
 };
 
-export const deleteList = async (listId) => {
+export const deleteList = async (data) => {
   try {
     await prisma.lists.delete({
       where: {
-        id: listId,
+        id: data.listId,
       },
     });
 
