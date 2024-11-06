@@ -223,23 +223,21 @@ export const CommentPost = async (data, userId) => {
     });
 
     return {
-      data: {
-        id: comment.id,
-        postId: comment.postId,
-        userId: comment.userId,
-        content: comment.content,
-      },
+      data: comment,
     };
   } catch (error) {
     return { error: error.message };
   }
 };
 
-export const GetComments = async (postId) => {
+export const GetComments = async (data) => {
   try {
     const comments = await prisma.comments.findMany({
       where: {
-        postId: postId,
+        postId: data.postId,
+      },
+      orderBy: {
+        createdAt: "desc",
       },
     });
 
