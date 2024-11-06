@@ -157,7 +157,7 @@ const _CommentPost = async (req, res) => {
 
 const _DeleteComment = async (req, res) => {
   try {
-    const post = await DeleteComment(req.params.id);
+    const post = await DeleteComment(req.body, req.userId);
     if (post.error) {
       return res.status(400).json({ message: post.error });
     }
@@ -173,7 +173,7 @@ const _DeleteComment = async (req, res) => {
 
 const _GetComments = async (req, res) => {
   try {
-    const post = await GetComments(req.params.id);
+    const post = await GetComments(req.body);
     if (post.error) {
       return res.status(400).json({ message: post.error });
     }
