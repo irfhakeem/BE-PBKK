@@ -222,8 +222,22 @@ export const CommentPost = async (data, userId) => {
       },
     });
 
+    const user = await prisma.users.findUnique({
+      where: {
+        id: userId,
+      },
+      select: {
+        name: true,
+      },
+    });
+
     return {
-      data: comment,
+      data: {
+        ...comment,
+        user: {
+          name: user.name,
+        },
+      },
     };
   } catch (error) {
     return { error: error.message };
@@ -239,10 +253,22 @@ export const GetComments = async (data) => {
       orderBy: {
         createdAt: "desc",
       },
+      include: {
+        user: {
+          select: {
+            name: true,
+          },
+        },
+      },
     });
 
+    const formattedComments = comments.map((comment) => ({
+      ...comment,
+      name: comment.user.name,
+    }));
+
     return {
-      data: comments,
+      data: formattedComments,
     };
   } catch (error) {
     return { error: error.message };
