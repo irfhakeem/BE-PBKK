@@ -3,6 +3,7 @@ import {
   GetRecommendedTags,
   GetTagById,
   GetContentByTag,
+  GetRecommendedDetail,
 } from "../service/tag.service.js";
 
 const _CreateTag = async (req, res) => {
@@ -57,9 +58,24 @@ const _GetContentByTag = async (req, res) => {
   }
 };
 
+const _GetRecommendedDetail = async (req, res) => {
+  try {
+    const response = await GetRecommendedDetail(req.query);
+
+    if (response.error) {
+      return res.status(400).json({ message: response.error });
+    }
+
+    return res.status(200).json({ data: response.data });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
 export default {
   _CreateTag,
   _GetRecommendedTags,
   _GetTagById,
   _GetContentByTag,
+  _GetRecommendedDetail,
 };
