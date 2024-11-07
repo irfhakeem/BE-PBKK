@@ -268,3 +268,179 @@ export const GetContentByTag = async (data) => {
     return { error: error.message };
   }
 };
+
+export const GetRecommendedDetail = async (data) => {
+  try {
+    const { query, type } = data;
+
+    if (!query || !type) {
+      return { error: "Query and type are required" };
+    }
+
+    let result;
+
+    switch (type) {
+      case "post":
+        result = await prisma.posts.findMany({
+          where: {
+            OR: [
+              {
+                title: {
+                  contains: query,
+                  mode: "insensitive",
+                },
+              },
+              {
+                caption: {
+                  contains: query,
+                  mode: "insensitive",
+                },
+              },
+              {
+                tags: {
+                  some: {
+                    tag: {
+                      name: {
+                        contains: query,
+                        mode: "insensitive",
+                      },
+                    },
+                  },
+                },
+              },
+            ],
+          },
+          include: {
+            _count: {
+              select: { likes: true, comments: true },
+            },
+          },
+        });
+        result = result.map((post) => ({
+          ...post,
+          likeCount: post._count.likes,
+          commentCount: post._count.comments,
+        }));
+        break;
+
+      case "user":
+        result = await prisma.users.findMany({
+          where: {
+            OR: [
+              {
+                username: {
+                  contains: query,
+                  mode: "insensitive",
+                },
+              },
+              {
+                bio: {
+                  contains: query,
+                  mode: "insensitive",
+                },
+              },
+              {
+                posts: {
+                  some: {
+                    tags: {
+                      some: {
+                        tag: {
+                          name: {
+                            contains: query,
+                            mode: "insensitive",
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            ],
+          },
+          include: {
+            _count: {
+              select: { followers: true },
+            },
+          },
+        });
+        result = result.map((user) => ({
+          ...user,
+          followerCount: user._count.followers,
+        }));
+        break;
+
+      case "list":
+        result = await prisma.lists.findMany({
+          where: {
+            OR: [
+              {
+                title: {
+                  contains: query,
+                  mode: "insensitive",
+                },
+              },
+              {
+                posts: {
+                  some: {
+                    tags: {
+                      some: {
+                        tag: {
+                          name: {
+                            contains: query,
+                            mode: "insensitive",
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            ],
+          },
+          include: {
+            posts: {
+              include: {
+                _count: {
+                  select: { likes: true, comments: true },
+                },
+              },
+            },
+          },
+          orderBy: {
+            createdAt: "desc",
+          },
+        });
+        const userIds = result.map((list) => list.userId);
+        const usersInLists = await prisma.users.findMany({
+          where: {
+            id: {
+              in: userIds,
+            },
+          },
+          select: {
+            id: true,
+            username: true,
+          },
+        });
+        result = result.map((list) => ({
+          ...list,
+          posts: list.posts.map((post) => ({
+            ...post,
+            likeCount: post._count.likes,
+            commentCount: post._count.comments,
+          })),
+          username:
+            usersInLists.find((user) => user.id === list.userId)?.username ||
+            null,
+        }));
+        break;
+
+      default:
+        return { error: "Invalid type" };
+    }
+
+    return { data: result };
+  } catch (error) {
+    return { error: error.message };
+  }
+};
