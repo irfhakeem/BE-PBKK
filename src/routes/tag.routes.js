@@ -8,5 +8,10 @@ router.get("/tag/recommended", authenticate, tagController._GetRecommendedTags);
 router.post("/tag", authenticate, tagController._GetTagById);
 router.post("/tag/create", authenticate, tagController._CreateTag);
 router.post("/tag/contents", authenticate, tagController._GetContentByTag);
+router.get(
+  "/tag/recommended/detail",
+  authenticate,
+  tagController._GetRecommendedDetail
+);
 
 export default router;
