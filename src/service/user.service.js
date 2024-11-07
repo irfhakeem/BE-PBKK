@@ -73,9 +73,9 @@ export const LoginUser = async (data) => {
       };
     }
 
-    const user = await prisma.users.findUnique({
+    const user = await prisma.users.findFirst({
       where: {
-        email: data.email,
+        OR: [{ email: data.email }, { username: data.email }],
       },
     });
 
