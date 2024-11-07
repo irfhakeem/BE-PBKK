@@ -14,5 +14,6 @@ router.patch("/user/deactivate", authenticate, userController._DeactivateUser);
 router.post("/user/follow", authenticate, userController._FollowUser);
 router.delete("/user/unfollow", authenticate, userController._UnfollowUser);
 router.post("/user/is-following", authenticate, userController._IsFollowing);
+router.get("/search", authenticate, userController._Search);
 
 export default router;
