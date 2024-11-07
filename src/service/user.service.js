@@ -402,3 +402,153 @@ export const GetFollowing = async (userId) => {
     return { error: error.message };
   }
 };
+
+export const Search = async (data) => {
+  try {
+    const { query, type } = data;
+
+    if (!query || !type) {
+      return { error: "Query and type are required" };
+    }
+
+    let result;
+
+    switch (type) {
+      case "post":
+        result = await prisma.posts.findMany({
+          where: {
+            OR: [
+              {
+                title: {
+                  contains: query,
+                  mode: "insensitive",
+                },
+              },
+              {
+                caption: {
+                  contains: query,
+                  mode: "insensitive",
+                },
+              },
+              {
+                tags: {
+                  some: {
+                    tag: {
+                      name: {
+                        contains: query,
+                        mode: "insensitive",
+                      },
+                    },
+                  },
+                },
+              },
+            ],
+          },
+          include: {
+            _count: {
+              select: { likes: true, comments: true },
+            },
+          },
+        });
+        result = result.map((post) => ({
+          ...post,
+          likeCount: post._count.likes,
+          commentCount: post._count.comments,
+        }));
+        break;
+
+      case "user":
+        result = await prisma.users.findMany({
+          where: {
+            isDeactivated: false,
+            OR: [
+              {
+                username: {
+                  contains: query,
+                  mode: "insensitive",
+                },
+              },
+              {
+                bio: {
+                  contains: query,
+                  mode: "insensitive",
+                },
+              },
+              {
+                name: {
+                  contains: query,
+                  mode: "insensitive",
+                },
+              },
+            ],
+          },
+          include: {
+            _count: {
+              select: { followers: true },
+            },
+          },
+        });
+        result = result.map((user) => ({
+          ...user,
+          followerCount: user._count.followers,
+        }));
+        break;
+
+      case "list":
+        result = await prisma.lists.findMany({
+          where: {
+            OR: [
+              {
+                title: {
+                  contains: query,
+                  mode: "insensitive",
+                },
+              },
+            ],
+          },
+          include: {
+            user: {
+              select: {
+                username: true,
+              },
+            },
+            posts: {
+              take: 3,
+            },
+          },
+          orderBy: {
+            createdAt: "desc",
+          },
+        });
+
+        result = result.map((list) => ({
+          ...list,
+          username: list.user.username,
+          posts: list.posts,
+        }));
+
+        break;
+
+      case "tag":
+        result = await prisma.tags.findMany({
+          where: {
+            name: {
+              contains: query,
+              mode: "insensitive",
+            },
+          },
+        });
+        break;
+      default:
+        return { error: "Invalid type" };
+    }
+
+    if (!result) {
+      return { error: "No result found" };
+    }
+
+    return { data: result };
+  } catch (error) {
+    return { error: error.message };
+  }
+};
