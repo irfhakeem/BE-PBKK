@@ -12,6 +12,7 @@ import {
   IsFollowing,
   GetRandomUsers,
   GetFollowing,
+  Search,
 } from "../service/user.service.js";
 
 const _RegisterUser = async (req, res) => {
@@ -223,6 +224,20 @@ const _GetFollowing = async (req, res) => {
   }
 };
 
+const _Search = async (req, res) => {
+  try {
+    const response = await Search(req.query);
+
+    if (response.error) {
+      return res.status(400).json({ message: response.error });
+    }
+
+    return res.status(200).json({ data: response.data });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
 export default {
   _LoginUser,
   _RegisterUser,
@@ -236,4 +251,5 @@ export default {
   _UnfollowUser,
   _IsFollowing,
   _GetFollowing,
+  _Search,
 };
