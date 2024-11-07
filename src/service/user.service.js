@@ -137,18 +137,26 @@ export const Me = async (id) => {
     });
 
     if (!user) {
-      return { error: messages.ErrUserNotFound };
+      return { error: "User not found or deactivated" };
     }
+
+    const followers = await prisma.userFollowers.findMany({
+      where: {
+        followingId: user.id,
+      },
+      select: {
+        follower: {
+          select: {
+            id: true,
+          },
+        },
+      },
+    });
 
     return {
       data: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        username: user.username,
-        avatar: user.avatar,
-        bio: user.bio,
-        banner: user.banner,
+        ...user,
+        followers: followers.length,
       },
     };
   } catch (error) {
@@ -251,18 +259,26 @@ export const GetUserByUsername = async (username) => {
     });
 
     if (!user) {
-      return { error: messages.ErrUserNotFound };
+      return { error: "User not found or deactivated" };
     }
+
+    const followers = await prisma.userFollowers.findMany({
+      where: {
+        followingId: user.id,
+      },
+      select: {
+        follower: {
+          select: {
+            id: true,
+          },
+        },
+      },
+    });
 
     return {
       data: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        username: user.username,
-        avatar: user.avatar,
-        bio: user.bio,
-        banner: user.banner,
+        ...user,
+        followers: followers.length,
       },
     };
   } catch (error) {
