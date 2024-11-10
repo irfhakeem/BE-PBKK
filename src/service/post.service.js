@@ -13,7 +13,7 @@ export const CreatePost = async (data, userId) => {
       return { error: "All data are required!" };
     }
 
-    const post = await prisma.posts.create({
+    const newPost = await prisma.posts.create({
       data: {
         title: data.title,
         content: data.content,
@@ -24,19 +24,35 @@ export const CreatePost = async (data, userId) => {
             id: userId,
           },
         },
-        tags: data.tags,
+      },
+    });
+
+    for (const tagId of data.tags) {
+      await prisma.postsOnTags.create({
+        data: {
+          postId: newPost.id,
+          tagId: tagId,
+        },
+      });
+    }
+
+    const tags = await prisma.postsOnTags.findMany({
+      where: {
+        postId: newPost.id,
+      },
+      select: {
+        tag: {
+          select: {
+            name: true,
+          },
+        },
       },
     });
 
     return {
       data: {
-        id: post.id,
-        title: post.title,
-        content: post.content,
-        caption: post.caption,
-        image: post.image,
-        author: post.authorId,
-        tags: post.tags,
+        ...newPost,
+        tags: tags.map((tag) => tag.tag.name),
       },
     };
   } catch (error) {
