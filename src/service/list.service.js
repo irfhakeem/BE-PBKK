@@ -11,7 +11,8 @@ export const getMyLists = async (userId) => {
       },
     });
 
-    if (!lists || lists.length === 0) {
+    if (!lists) {
+      console.log("No lists found for this user.");
       return { error: "No lists found for this user." };
     }
 
@@ -114,7 +115,7 @@ export const getUserLists = async (data) => {
       },
     });
 
-    if (!lists || lists.length === 0) {
+    if (!lists) {
       return { error: "No lists found for this user." };
     }
 
