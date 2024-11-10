@@ -127,6 +127,11 @@ export const GetContentByTag = async (data) => {
       },
       take: 8,
       include: {
+        author: {
+          select: {
+            username: true,
+          },
+        },
         _count: {
           select: { likes: true, comments: true },
         },
@@ -136,6 +141,7 @@ export const GetContentByTag = async (data) => {
     // Add likeCount and commentCount to posts
     const postsWithCounts = posts.map((post) => ({
       ...post,
+      authorUsername: post.author.username,
       likeCount: post._count.likes,
       commentCount: post._count.comments,
     }));
