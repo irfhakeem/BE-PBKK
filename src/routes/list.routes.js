@@ -16,5 +16,6 @@ router.patch(
 );
 router.post("/list/is-post-listed", authenticate, listController._isPostListed);
 router.get("/list/:id", authenticate, listController._getSpecificList);
+router.patch("/list/update", authenticate, listController._updateList);
 
 export default router;
