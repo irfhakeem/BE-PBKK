@@ -7,6 +7,7 @@ import {
   addPostToList,
   removePostFromList,
   isPostListed,
+  updateList,
 } from "../service/list.service.js";
 
 const _createList = async (req, res) => {
@@ -121,6 +122,19 @@ const _isPostListed = async (req, res) => {
   }
 };
 
+const _updateList = async (req, res) => {
+  try {
+    const response = await updateList(req.body);
+    if (response.error) {
+      return res.status(400).json({ message: response.error });
+    }
+
+    return res.status(200).json({ data: response.data });
+  } catch (error) {
+    return res.status(500).json({ message: response.error });
+  }
+};
+
 export default {
   _createList,
   _getMyLists,
@@ -130,4 +144,5 @@ export default {
   _addPostToList,
   _removePostFromList,
   _isPostListed,
+  _updateList,
 };
