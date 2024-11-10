@@ -136,6 +136,16 @@ export const GetPostById = async (id) => {
             username: true,
           },
         },
+        tags: {
+          select: {
+            tag: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+        },
         _count: {
           select: { likes: true, comments: true },
         },
@@ -149,6 +159,7 @@ export const GetPostById = async (id) => {
     return {
       data: {
         ...post,
+        tags: post.tags.map((tag) => ({ id: tag.tag.id, name: tag.tag.name })),
         authorUsername: post.author.username,
         likeCount: post._count.likes,
         commentCount: post._count.comments,
