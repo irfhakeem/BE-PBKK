@@ -173,15 +173,11 @@ export const GetPostById = async (id) => {
 
 export const DeletePost = async (id) => {
   try {
-    const res = await prisma.posts.delete({
+    await prisma.posts.delete({
       where: {
         id: id,
       },
     });
-
-    if (!res) {
-      return { error: "Post not found." };
-    }
 
     return {
       data: "Post deleted successfully.",
@@ -324,6 +320,39 @@ export const DeleteComment = async (data, userId) => {
 
     return {
       data: "Comment deleted successfully.",
+    };
+  } catch (error) {
+    return { error: error.message };
+  }
+};
+
+export const GetUserPosts = async (userId) => {
+  try {
+    const posts = await prisma.posts.findMany({
+      where: {
+        authorId: userId,
+      },
+      include: {
+        author: {
+          select: {
+            username: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    const postsWithUsername = posts.map((post) => {
+      return {
+        ...post,
+        authorUsername: post.author.username,
+      };
+    });
+
+    return {
+      data: postsWithUsername,
     };
   } catch (error) {
     return { error: error.message };
