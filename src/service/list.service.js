@@ -82,7 +82,12 @@ export const createList = async (userId, data) => {
       return { error: messages.ErrCreateList };
     }
 
-    return { data: list };
+    return {
+      data: {
+        ...list,
+        posts: [],
+      },
+    };
   } catch (error) {
     return { error: error.message };
   }
@@ -196,6 +201,27 @@ export const isPostListed = async (userId, data) => {
       listId: listWithPost.id,
       message: "Post found in user's list",
     };
+  } catch (error) {
+    return { error: error.message };
+  }
+};
+
+export const updateList = async (data) => {
+  try {
+    const list = await prisma.lists.update({
+      where: {
+        id: data.listId,
+      },
+      data: {
+        title: data.title,
+      },
+    });
+
+    if (!list) {
+      return { error: messages.ErrUpdateList };
+    }
+
+    return { data: list };
   } catch (error) {
     return { error: error.message };
   }
