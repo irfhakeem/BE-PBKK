@@ -13,5 +13,6 @@ router.get(
   authenticate,
   tagController._GetRecommendedDetail
 );
+router.get("/tags", authenticate, tagController._GetAllTags);
 
 export default router;

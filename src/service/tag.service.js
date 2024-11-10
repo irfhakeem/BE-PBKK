@@ -450,3 +450,13 @@ export const GetRecommendedDetail = async (data) => {
     return { error: error.message };
   }
 };
+
+export const GetAllTags = async () => {
+  try {
+    const tags = await prisma.tags.findMany();
+
+    return { data: tags };
+  } catch (error) {
+    return { error: error.message };
+  }
+};
