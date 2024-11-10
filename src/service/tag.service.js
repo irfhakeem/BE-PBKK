@@ -311,6 +311,11 @@ export const GetRecommendedDetail = async (data) => {
             ],
           },
           include: {
+            author: {
+              select: {
+                username: true,
+              },
+            },
             _count: {
               select: { likes: true, comments: true },
             },
@@ -318,6 +323,7 @@ export const GetRecommendedDetail = async (data) => {
         });
         result = result.map((post) => ({
           ...post,
+          authorUsername: post.author.username,
           likeCount: post._count.likes,
           commentCount: post._count.comments,
         }));

@@ -2,7 +2,7 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export const CreatePost = async (data, userId, username) => {
+export const CreatePost = async (data, userId) => {
   try {
     if (
       data.title === "" ||
@@ -18,17 +18,16 @@ export const CreatePost = async (data, userId, username) => {
         title: data.title,
         content: data.content,
         caption: data.caption,
-        image: data.image,
+        image: data.thumbnail,
         author: {
           connect: {
             id: userId,
           },
         },
-        authorUsername: username,
+        tags: data.tags,
       },
     });
 
-    console.log(data, userId, username);
     return {
       data: {
         id: post.id,
@@ -37,7 +36,7 @@ export const CreatePost = async (data, userId, username) => {
         caption: post.caption,
         image: post.image,
         author: post.authorId,
-        authorUsername: post.authorUsername,
+        tags: post.tags,
       },
     };
   } catch (error) {
@@ -77,6 +76,11 @@ export const GetPosts = async (data) => {
       },
       where: data.userId ? { authorId: data.userId } : undefined,
       include: {
+        author: {
+          select: {
+            username: true,
+          },
+        },
         _count: {
           select: { likes: true, comments: true },
         },
@@ -86,6 +90,7 @@ export const GetPosts = async (data) => {
     // Map posts to include likeCount property
     const postsWithLikes = posts.map((post) => ({
       ...post,
+      authorUsername: post.author.username,
       likeCount: post._count.likes,
       commentCount: post._count.comments,
     }));
@@ -110,6 +115,11 @@ export const GetPostById = async (id) => {
     const post = await prisma.posts.findUnique({
       where: { id: id },
       include: {
+        author: {
+          select: {
+            username: true,
+          },
+        },
         _count: {
           select: { likes: true, comments: true },
         },
@@ -123,6 +133,7 @@ export const GetPostById = async (id) => {
     return {
       data: {
         ...post,
+        authorUsername: post.author.username,
         likeCount: post._count.likes,
         commentCount: post._count.comments,
       },

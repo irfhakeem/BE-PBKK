@@ -42,6 +42,11 @@ export const getSpecificList = async (listId) => {
         },
       },
       include: {
+        author: {
+          select: {
+            username: true,
+          },
+        },
         _count: {
           select: { likes: true, comments: true },
         },
@@ -51,6 +56,7 @@ export const getSpecificList = async (listId) => {
     const formattedPosts = posts.map((post) => {
       return {
         ...post,
+        authorUsername: post.author.username,
         likeCount: post._count.likes,
         commentCount: post._count.comments,
       };
