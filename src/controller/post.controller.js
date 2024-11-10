@@ -9,6 +9,7 @@ import {
   CommentPost,
   DeleteComment,
   GetComments,
+  GetUserPosts,
 } from "../service/post.service.js";
 
 const _CreatePost = async (req, res) => {
@@ -187,6 +188,23 @@ const _GetComments = async (req, res) => {
   }
 };
 
+const _GetUserPosts = async (req, res) => {
+  try {
+    const posts = await GetUserPosts(req.userId);
+    if (posts.error) {
+      return res.status(400).json({ message: posts.error });
+    }
+
+    res.status(200).json({
+      status: "success",
+      message: "Posts retrieved successfully.",
+      data: posts.data,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching posts", error });
+  }
+};
+
 export default {
   _CreatePost,
   _GetPosts,
@@ -198,4 +216,5 @@ export default {
   _CommentPost,
   _DeleteComment,
   _GetComments,
+  _GetUserPosts,
 };
